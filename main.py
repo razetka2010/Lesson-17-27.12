@@ -107,12 +107,13 @@ for event in longpoll.listen():
             send(uid,
                  "Вибери игру:\n"
                  "1 - Угадай игру\n"
-                 "2 - Угадай город по фотографии"
-                 "3 - Правда или ложь")
+                 "2 - Угадай город по фотографии\n"
+                 "3 - Правда или ложь\n")
             continue
 
         if text in commands and callable(commands[text]):
             commands[text](uid)
             continue
+
 
         send(uid, "Я тебя не понял. Напиши: игры")
