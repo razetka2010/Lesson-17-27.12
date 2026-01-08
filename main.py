@@ -32,10 +32,19 @@ def start_city_game(uid):
         "псков": "photo-234450844_456239029",
         "велиж": "photo-234450844_456239026"
     }
-
     city, photo_id = random.choice(list(cities.items()))
     game_state[uid] = {"mode": "сity_photo", "сity": city}
     send(uid, text="Угадай город по фотографии:", attachment=photo_id)
+
+def start_truth_game(uid):
+    facts = [
+        ("У пингвинов есть колени.", "Правда"),
+        ("Жирафы не умеют спать.", "Ложь"),
+        ("Python назван в честь змеи.", "Ложь"),
+    ]
+    text, correct = random.choice(facts)
+    game_state[uid] = {"mode": "quiz", "correct": correct}
+    send(uid, f"Правда или ложь?\n{text}")
 
 def process_game(uid, text):
     mode = game_state[uid]["mode"]
@@ -65,10 +74,23 @@ def process_game(uid, text):
 
         game_state.pop(uid)
         return
+
+    if mode == "quiz":
+        correct = game_state[uid]["correct"]
+
+        if text.lower() == correct:
+            send(uid, "Верно!")
+        else:
+            send(uid, f"Неправильно! Ответ: {correct}")
+
+        game_state.pop(uid)
+        return
     
 commands = {
     "игры": "menu",
     "1": start_number_game,
+    "2": start_city_game,
+    "3": start_truth_game
 }
 
 for event in longpoll.listen():
@@ -84,7 +106,9 @@ for event in longpoll.listen():
         if text == "игры":
             send(uid,
                  "Вибери игру:\n"
-                 "1 - Угадай игру")
+                 "1 - Угадай игру\n"
+                 "2 - Угадай город по фотографии"
+                 "3 - Правда или ложь")
             continue
 
         if text in commands and callable(commands[text]):
